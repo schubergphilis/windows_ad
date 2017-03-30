@@ -56,7 +56,7 @@ action :join do
       new_resource.updated_by_last_action(false)
     else
       powershell_script "join_#{new_resource.name}" do
-        if node['os_version'] >= '6.2'
+        if Chef::Version.new(node['os_version']) >= Chef::Version.new('6.2')
           cmd_text = "Add-Computer -DomainName #{new_resource.domain_name} -Credential $mycreds -Force:$true"
           cmd_text << " -OUPath '#{ou_dn}'" if new_resource.ou
           cmd_text << ' -Restart' if new_resource.restart
@@ -81,7 +81,7 @@ action :unjoin do
   if computer_exists?
     Chef::Log.debug("Removing computer from the domain")
     powershell_script "unjoin_#{new_resource.domain_name}" do
-      if node['os_version'] >= '6.2'
+      if Chef::Version.new(node['os_version']) >= Chef::Version.new('6.2')
         cmd_text = 'Remove-Computer -UnjoinDomainCredential $mycreds -Force:$true'
         cmd_text << " -ComputerName #{new_resource.name}"
         cmd_text << ' -Restart' if new_resource.restart
